@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | Threat Intel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="threat-intel">
+  <div class="page-loader" id="page-loader"><i class="fas fa-shield-halved fa-spin"></i></div>
+
+  <div class="app-container" id="app">
+    <div id="sidebar-slot"></div>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title"></div>
+        <div class="topbar-actions">
+          <i class="fas fa-expand" onclick="document.documentElement.requestFullscreen()"></i>
+          <i class="fas fa-circle-question"></i>
+          <div class="notif-badge"><i class="fas fa-bell"></i></div>
+          <div class="avatar" id="user-avatar">A</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center; margin-top: 10vh">
+          <i class="fas fa-virus" style="font-size: 50px; color: var(--red); margin-bottom: 20px"></i>
+          <h3 style="color: var(--text-main); margin-bottom: 20px; font-size: 16px">IP / Hash Reputation Lookup</h3>
+          <input type="text" placeholder="Enter IP or File Hash..." style="width: 80%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border); color: white; border-radius: 6px; margin-bottom: 15px" />
+          <br />
+          <button style="background: var(--accent); color: black; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer">
+            Query Threat Intel
+          </button>
+          <div style="margin-top: 30px; text-align: left; font-size: 13px; color: var(--text-dim); line-height: 1.6">
+            <p><strong>VirusTotal:</strong> 14/94 Vendors flagged malicious.</p>
+            <p><strong>AbuseIPDB:</strong> 100% Confidence of Spam/Fraud. Tor exit node detected.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

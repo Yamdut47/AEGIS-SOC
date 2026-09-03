@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | DB Seeder</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="page-loader" id="page-loader"><i class="fas fa-shield-halved fa-spin"></i></div>
+
+  <div id="seed-ui" style="display: none">
+    <div class="card" style="max-width: 520px; margin: 10vh auto; text-align: center">
+      <h2 style="color: var(--accent); margin-bottom: 15px"><i class="fas fa-database"></i> Database Seeder</h2>
+      <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 20px">
+        One-time setup: fills your Firebase Realtime Database with demo data.
+      </p>
+      <button id="seed-btn" style="background: var(--green); color: black; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-right: 10px">
+        Seed Demo Data
+      </button>
+      <button id="clear-btn" style="background: var(--bg-dark); color: white; border: 1px solid var(--border); padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer">
+        Clear All Data
+      </button>
+      <div id="seed-log" style="margin-top: 25px; font-family: monospace; font-size: 12px; color: var(--green); text-align: left; line-height: 1.8"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+    auth.onAuthStateChanged((user) => {
+      if (!user) { window.location.replace("index.html"); return; }
+      document.getElementById("page-loader").remove();
+      document.getElementById("seed-ui").style.display = "block";
+    });
+
+    document.getElementById("seed-btn").addEventListener("click", () => {
+      const log = (m) => { document.getElementById("seed-log").innerHTML += "✔ " + m + "<br>"; };
+      const now = Date.now(), min = 60000;
+      const updates = {};
+      const pk = (path) => db.ref(path).push().key;
+
+      updates["stats/totalEvents"] = 142509;
+      updates["stats/alertSeq"] = 1042;
+
+      // ---- ALERTS ----
+      [
+        { ts: now - 3 * min,  seq: 1042, source: "192.168.1.50",  classification: "SSH Brute Force",      risk: 94.2, mitre: "T1110", status: "open",   category: "Brute Force" },
+        { ts: now - 6 * min,  seq: 1041, source: "45.33.32.1",    classification: "Reconnaissance",       risk: 45.0, mitre: "T1046", status: "closed", category: "Reconnaissance" },
+        { ts: now - 9 * min,  seq: 1040, source: "10.0.0.12",     classification: "SQL Injection",        risk: 99.1, mitre: "T1190", status: "open",   category: "SQL Injection" },
+        { ts: now - 15 * min, seq: 1039, source: "192.168.1.105", classification: "Malware C2 Callback",  risk: 88.7, mitre: "T1071", status: "open",   category: "Malware" },
+        { ts: now - 20 * min, seq: 1038, source: "185.220.101.4", classification: "DDoS Traffic Pattern", risk: 61.3, mitre: "T1498", status: "open",   category: "DDoS" },
+        { ts: now - 30 * min, seq: 1037, source: "91.240.118.222",classification: "Port Scan",            risk: 38.5, mitre: "T1046", status: "closed", category: "Reconnaissance" }
+      ].forEach(a => { updates["alerts/" + pk("alerts")] = a; });
+      log("6 alerts");
+
+      // ---- INCIDENTS ----
+      [
+        { ts: now - 8 * min,  title: "INC-2024-08: Multi-Stage Web Attack", desc: "Correlated alerts: Port Scan -> Directory Traversal -> SQL Injection. Origin: 192.168.1.50.", severity: "critical", status: "investigating" },
+        { ts: now - 45 * min, title: "INC-2024-07: Internal DDoS Pattern",  desc: "High volume of SYN packets detected from multiple internal IPs targeting DB server.",         severity: "high",     status: "open" }
+      ].forEach(i => { updates["incidents/" + pk("incidents")] = i; });
+      log("2 incidents");
+
+      // ---- ASSETS ----
+      [
+        { name: "WEB-PROD-01", ip: "10.0.0.5",  type: "Web Server", os: "Ubuntu 22.04",       criticality: "High",     health: "Healthy" },
+        { name: "DB-PRIMARY",  ip: "10.0.0.10", type: "Database",   os: "Windows Server 2019", criticality: "Critical", health: "Compromised" },
+        { name: "FW-EDGE-01",  ip: "10.0.0.1",  type: "Firewall",   os: "Palo Alto OS",        criticality: "Critical", health: "Healthy" }
+      ].forEach(a => { updates["assets/" + pk("assets")] = a; });
+      log("3 assets");
+
+      // ---- NOTIFICATIONS ----
+      [
+        { ts: now - 2 * min,  title: "Critical Incident Escalated", message: "INC-2024-08 requires immediate Tier 3 review.",          read: false },
+        { ts: now - 20 * min, title: "SOAR Playbook Executed",       message: "IP 192.168.1.50 successfully blocked at perimeter.",   read: false },
+        { ts: now - 60 * min, title: "Threat Feed Updated",          message: "New IOCs synchronized from 3 intelligence sources.",   read: true }
+      ].forEach(n => { updates["notifications/" + pk("notifications")] = n; });
+      log("3 notifications");
+
+      // ---- SOAR ACTIONS ----
+      [
+        { ts: now - 3 * min,  trigger: "SSH Brute Force", action: "iptables -A INPUT -s 192.168.1.50 -j DROP", status: "Success" },
+        { ts: now - 10 * min, trigger: "SQL Injection",   action: "WAF Rule Applied: Block SQL Chars",         status: "Success" }
+      ].forEach(a => { updates["soar/" + pk("soar")] = a; });
+      log("2 SOAR actions");
+
+      // ---- INITIAL EVENTS ----
+      const seedEvents = [
+        { level: "INFO",  src: "8.8.4.4",       dst: "10.0.0.1",   proto: "UDP", port: 53,  payload: "DNS Query api.google-analytics.com" },
+        { level: "WARN",  src: "45.33.32.1",    dst: "10.0.0.1",   proto: "TCP", port: 3389, payload: "Port scan attempt (RDP)" },
+        { level: "INFO",  src: "192.168.1.20",  dst: "10.0.0.5",   proto: "TCP", port: 443, payload: "TLS handshake OK" },
+        { level: "CRIT",  src: "192.168.1.105", dst: "10.0.0.5",   proto: "TCP", port: 80,  payload: "SQLi pattern ' OR 1=1-- detected" },
+        { level: "INFO",  src: "104.16.0.1",    dst: "192.168.1.30", proto: "TCP", port: 443, payload: "HTTP 200 GET /cdn/assets.min.js" },
+        { level: "WARN",  src: "185.220.101.4", dst: "10.0.0.10",  proto: "TCP", port: 22,  payload: "SSH auth failure x12 (Tor exit node)" },
+        { level: "ALERT", src: "91.240.118.222",dst: "10.0.0.1",   proto: "TCP", port: 80,  payload: "Suricata [SID 2001219] ET SCAN Nmap" },
+        { level: "CRIT",  src: "192.168.1.105", dst: "45.33.32.1", proto: "TCP", port: 443, payload: "C2 beacon interval 45s" }
+      ];
+      seedEvents.forEach((e, i) => {
+        updates["events/" + pk("events")] = { ts: now - (seedEvents.length - i) * 8000, ...e };
+      });
+      log("8 events + stats");
+
+      db.ref().update(updates)
+        .then(() => log("DONE! Open dashboard.html — you can delete seed.html now."))
+        .catch((err) => log("ERROR: " + err.message));
+    });
+
+    document.getElementById("clear-btn").addEventListener("click", () => {
+      if (confirm("Delete ALL AEGIS-SOC data from Firebase?")) {
+        db.ref().remove().then(() => {
+          document.getElementById("seed-log").innerHTML = "✔ Database cleared.";
+        });
+      }
+    });
+  </script>
+</body>
+</html>

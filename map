@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | Attack Map</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="map">
+  <div class="page-loader" id="page-loader"><i class="fas fa-shield-halved fa-spin"></i></div>
+
+  <div class="app-container" id="app">
+    <div id="sidebar-slot"></div>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title"></div>
+        <div class="topbar-actions">
+          <i class="fas fa-expand" onclick="document.documentElement.requestFullscreen()"></i>
+          <i class="fas fa-circle-question"></i>
+          <div class="notif-badge"><i class="fas fa-bell"></i></div>
+          <div class="avatar" id="user-avatar">A</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="map-container">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    window.addEventListener("aegis-ready", () => {
+      setTimeout(() => {
+        const map = L.map("map").setView([27.7172, 85.3240], 3);
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+          attribution: "&copy; OpenStreetMap &copy; CARTO",
+          subdomains: "abcd",
+          maxZoom: 19
+        }).addTo(map);
+
+        // Your SOC / HQ location (Kathmandu)
+        const hq = [27.7172, 85.3240];
+        L.circleMarker(hq, { radius: 8, color: "#22c55e", fillOpacity: 0.8 })
+          .addTo(map).bindPopup("AEGIS-SOC HQ");
+
+        // Sample attack sources (replace with real data later)
+        const attacks = [
+          { lat: 35.68, lon: 139.69, label: "SSH Brute Force" },
+          { lat: 51.50, lon: -0.12, label: "Port Scan" },
+          { lat: 37.77, lon: -122.41, label: "SQL Injection" },
+          { lat: 55.75, lon: 37.61, label: "Malware C2 Beacon" },
+          { lat: -33.86, lon: 151.20, label: "DDoS Traffic" }
+        ];
+
+        attacks.forEach((a) => {
+          L.circleMarker([a.lat, a.lon], { radius: 7, color: "#ef4444", fillOpacity: 0.6 })
+            .addTo(map).bindPopup(a.label + " → HQ");
+          L.polyline([[a.lat, a.lon], hq], {
+            color: "#ef4444", weight: 1.5, opacity: 0.5, dashArray: "6,8"
+          }).addTo(map);
+        });
+      }, 200);
+    });
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

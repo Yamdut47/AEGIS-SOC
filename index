@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <h2><i class="fas fa-shield-halved"></i> AEGIS-SOC</h2>
+      <input type="email" id="login-email" placeholder="Email" autocomplete="username" />
+      <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+      <p id="login-error" class="login-error"></p>
+      <button id="login-btn" onclick="doLogin()">Secure Login</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+    // Already logged in? Go straight to dashboard
+    auth.onAuthStateChanged((user) => {
+      if (user) window.location.replace("dashboard.html");
+    });
+
+    function doLogin() {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      const errorEl = document.getElementById("login-error");
+      const btn = document.getElementById("login-btn");
+      errorEl.style.display = "none";
+
+      if (!email || !password) {
+        errorEl.textContent = "Please enter email and password.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Authenticating...";
+
+      auth.signInWithEmailAndPassword(email, password)
+        .catch((err) => {
+          errorEl.textContent = friendlyError(err.code);
+          errorEl.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Secure Login";
+        });
+    }
+
+    function friendlyError(code) {
+      switch (code) {
+        case "auth/invalid-email":      return "Invalid email address.";
+        case "auth/user-not-found":     return "No account found with this email.";
+        case "auth/wrong-password":     return "Incorrect password.";
+        case "auth/invalid-credential": return "Invalid email or password.";
+        case "auth/too-many-requests":  return "Too many attempts. Try again later.";
+        default:                        return "Login failed: " + code;
+      }
+    }
+
+    // Enter key = login
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") doLogin();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | Assets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="assets">
+  <div class="page-loader" id="page-loader"><i class="fas fa-shield-halved fa-spin"></i></div>
+
+  <div class="app-container" id="app">
+    <div id="sidebar-slot"></div>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title"></div>
+        <div class="topbar-actions">
+          <i class="fas fa-expand" onclick="document.documentElement.requestFullscreen()"></i>
+          <i class="fas fa-circle-question"></i>
+          <div class="notif-badge"><i class="fas fa-bell"></i></div>
+          <div class="avatar" id="user-avatar">A</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Asset Name</th>
+                <th>IP Address</th>
+                <th>Type</th>
+                <th>OS</th>
+                <th>Criticality</th>
+                <th>Health</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><i class="fas fa-server blue"></i> WEB-PROD-01</td>
+                <td>10.0.0.5</td>
+                <td>Web Server</td>
+                <td>Ubuntu 22.04</td>
+                <td><span class="badge bg-red">High</span></td>
+                <td><span class="badge bg-green">Healthy</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-database purple"></i> DB-PRIMARY</td>
+                <td>10.0.0.10</td>
+                <td>Database</td>
+                <td>Windows Server 2019</td>
+                <td><span class="badge bg-red">Critical</span></td>
+                <td><span class="badge bg-red">Compromised</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-shield-halved yellow"></i> FW-EDGE-01</td>
+                <td>10.0.0.1</td>
+                <td>Firewall</td>
+                <td>Palo Alto OS</td>
+                <td><span class="badge bg-red">Critical</span></td>
+                <td><span class="badge bg-green">Healthy</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

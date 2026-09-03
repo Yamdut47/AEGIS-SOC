@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="admin">
+  <div class="page-loader" id="page-loader"><i class="fas fa-shield-halved fa-spin"></i></div>
+
+  <div class="app-container" id="app">
+    <div id="sidebar-slot"></div>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title"></div>
+        <div class="topbar-actions">
+          <i class="fas fa-expand" onclick="document.documentElement.requestFullscreen()"></i>
+          <i class="fas fa-circle-question"></i>
+          <div class="notif-badge"><i class="fas fa-bell"></i></div>
+          <div class="avatar" id="user-avatar">A</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid-2" style="height: calc(100vh - 150px)">
+          <div class="card">
+            <h3 style="color: var(--text-main); font-size: 14px; margin-bottom: 15px">User Management</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><i class="fas fa-user-shield blue"></i> Admin</td>
+                  <td>admin@aegis.com</td>
+                  <td><span class="badge bg-red">Tier 3</span></td>
+                  <td><span class="badge bg-green">Active</span></td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-user purple"></i> Analyst-1</td>
+                  <td>analyst1@aegis.com</td>
+                  <td><span class="badge bg-blue">Tier 2</span></td>
+                  <td><span class="badge bg-green">Active</span></td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-user yellow"></i> Viewer</td>
+                  <td>viewer@aegis.com</td>
+                  <td><span class="badge bg-purple">Tier 1</span></td>
+                  <td><span class="badge bg-yellow">Suspended</span></td>
+                </tr>
+              </tbody>
+            </table>
+            <button style="background: var(--accent); color: black; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 15px">
+              + Add User
+            </button>
+          </div>
+
+          <div class="card">
+            <h3 style="color: var(--text-main); font-size: 14px; margin-bottom: 15px">System Settings</h3>
+            <table>
+              <tr>
+                <td><i class="fas fa-key blue"></i> Two-Factor Authentication</td>
+                <td><span class="badge bg-green">Enabled</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-clock yellow"></i> Session Timeout</td>
+                <td>30 minutes</td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-database purple"></i> Log Retention Policy</td>
+                <td>90 days</td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-satellite-dish green"></i> SIEM Integration</td>
+                <td><span class="badge bg-green">Connected</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-bolt red"></i> Autonomous SOAR Mode</td>
+                <td><span class="badge bg-green">Enabled</span></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

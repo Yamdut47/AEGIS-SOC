@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis-SOC | Response (SOAR)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="response">
+  <div class="page-loader" id="page-loader"><i class="fas fa-shield-halved fa-spin"></i></div>
+
+  <div class="app-container" id="app">
+    <div id="sidebar-slot"></div>
+    <div class="main-area">
+      <div id="topbar-slot"></div>
+
+      <div class="content">
+        <div class="grid-2" style="height: calc(100vh - 150px)">
+          <div class="card" style="border-left: 4px solid var(--green)">
+            <h3 style="color: var(--text-main); font-size: 14px; margin-bottom: 10px">Playbook: Autonomous IP Block</h3>
+            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 15px">
+              Triggers when: Risk Score > 80 AND Attack Type = Brute Force/SQLi<br>
+              Action: blocks the source IP of the latest open alert at the perimeter.
+            </p>
+            <button id="exec-playbook" style="background: var(--green); color: black; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold">
+              Execute Playbook Manually
+            </button>
+            <p id="playbook-status" style="margin-top: 15px; font-size: 12px; color: var(--text-dim)"></p>
+          </div>
+
+          <div class="card">
+            <h3 style="color: var(--text-main); font-size: 14px; margin-bottom: 15px">SOAR Action History (live)</h3>
+            <table>
+              <thead><tr><th>Time</th><th>Trigger</th><th>Action</th><th>Status</th></tr></thead>
+              <tbody id="soar-tbody"><tr><td colspan="4" style="color: var(--text-dim)">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    window.addEventListener("aegis-ready", () => {
+      const tbody = document.getElementById("soar-tbody");
+      const execBtn = document.getElementById("exec-playbook");
+      const statusP = document.getElementById("playbook-status");
+
+      db.ref("soar").on("value", (s) => {
+        const list = snapshotList(s);
+        tbody.innerHTML = list.map(a => `
+          <tr>
+            <td>${fmtTime(a.ts)}</td>
+            <td>${esc(a.trigger)}</td>
+            <td style="font-family: monospace; font-size: 11px; color: var(--green)">${esc(a.action)}</td>
+            <td>${badge(a.status, "bg-green")}</td>
+          </tr>`).join("") || `<tr><td colspan="4" style="color: var(--text-dim)">No actions yet.</td></tr>`;
+      });
+
+      execBtn.addEventListener("click", () => {
+        execBtn.disabled = true;
+        statusP.textContent = "Fetching threat data...";
+
+        db.ref("alerts").orderByChild("status").equalTo("open").limitToLast(1).once("value").then((s) => {
+          const entries = Object.entries(s.val() || {});
+          const target = entries.length ? entries[0][1].source : "45.33.32.1";
+          const action = `iptables -A INPUT -s ${target} -j DROP`;
+
+          return db.ref("soar").push({ ts: Date.now(), trigger: "Manual Execution", action, status: "Success" })
+            .then(() => db.ref("notifications").push({
+              ts: Date.now(), title: "SOAR Playbook Executed",
+              message: `IP ${target} blocked at perimeter (manual run).`, read: false
+            }))
+            .then(() => {
+              statusP.textContent = `✔ Blocked ${target} at perimeter — action saved + notification sent.`;
+              execBtn.disabled = false;
+            });
+        }).catch(() => {
+          statusP.textContent = "Error executing playbook.";
+          execBtn.disabled = false;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
